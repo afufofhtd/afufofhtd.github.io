@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Database</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+font-family: Arial;
+background:#f2f6f5;
+text-align:center;
+margin:0;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding:30px;
+}
+
+h1{
+color:#1b5e20;
+}
+
+input{
+padding:10px;
+margin:10px;
+width:250px;
+}
+
+button{
+padding:10px 20px;
+background:#2e7d32;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1b5e20;
+}
+
+.student-card{
+margin-top:30px;
+padding:20px;
+background:white;
+border-radius:10px;
+box-shadow:0 5px 10px rgba(0,0,0,0.15);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Student Database</h1>
+
+<h3>Add Student</h3>
+
+<input id="name" placeholder="Student Name"><br>
+<input id="roll" placeholder="Roll Number"><br>
+<input id="program" placeholder="Program"><br>
+<input id="email" placeholder="Email"><br>
+
+<button onclick="addStudent()">Add Student</button>
+
+<hr>
+
+<h3>Select Student</h3>
+
+<select id="studentList" onchange="showStudent()">
+<option value="">Select Student</option>
+</select>
+
+<div class="student-card" id="studentDetails">
+Student details will appear here
+</div>
+
+</div>
+
+<script>
+
+let students = JSON.parse(localStorage.getItem("students")) || [];
+
+function addStudent(){
+
+let name=document.getElementById("name").value;
+let roll=document.getElementById("roll").value;
+let program=document.getElementById("program").value;
+let email=document.getElementById("email").value;
+
+let student={
+name:name,
+roll:roll,
+program:program,
+email:email
+};
+
+students.push(student);
+
+localStorage.setItem("students",JSON.stringify(students));
+
+loadStudents();
+
+alert("Student Added");
+
+}
+
+function loadStudents(){
+
+let list=document.getElementById("studentList");
+
+list.innerHTML='<option value="">Select Student</option>';
+
+students.forEach((s,index)=>{
+
+let option=document.createElement("option");
+
+option.value=index;
+option.text=s.name;
+
+list.appendChild(option);
+
+});
+
+}
+
+function showStudent(){
+
+let index=document.getElementById("studentList").value;
+
+if(index==="") return;
+
+let s=students[index];
+
+document.getElementById("studentDetails").innerHTML=
+
+"<h3>"+s.name+"</h3>"+
+"<p><b>Roll:</b> "+s.roll+"</p>"+
+"<p><b>Program:</b> "+s.program+"</p>"+
+"<p><b>Email:</b> "+s.email+"</p>";
+
+}
+
+loadStudents();
+
+</script>
+
+</body>
+</html>
