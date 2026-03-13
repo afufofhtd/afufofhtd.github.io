@@ -66,6 +66,14 @@ color:#1b5e20;
 font-weight:bold;
 }
 
+.student-photo{
+width:120px;
+height:120px;
+border-radius:50%;
+object-fit:cover;
+margin-top:10px;
+}
+
 </style>
 </head>
 
@@ -82,23 +90,29 @@ font-weight:bold;
 <button onclick="showAdd()">➕ Add Student</button>
 <button onclick="showView()">📋 Show Student</button>
 
-<!-- ADD STUDENT FORM -->
+<!-- ADD / EDIT SECTION -->
 
 <div id="addSection" class="hidden">
 
-<h3>Add Student Details</h3>
+<h3>Add / Edit Student</h3>
 
 <input id="name" placeholder="Student Name"><br>
 <input id="roll" placeholder="Roll Number"><br>
 <input id="program" placeholder="Program"><br>
 <input id="email" placeholder="Email"><br>
 
-<button onclick="addStudent()">Save Student</button>
+<input type="file" id="photo" accept="image/*"><br>
+
+<img id="preview" class="student-photo hidden">
+
+<br>
+
+<button onclick="saveStudent()">Save Student</button>
 
 </div>
 
 
-<!-- VIEW STUDENT -->
+<!-- VIEW SECTION -->
 
 <div id="viewSection" class="hidden">
 
@@ -119,11 +133,38 @@ Student details will appear here
 <script>
 
 let students = JSON.parse(localStorage.getItem("students")) || [];
+let editIndex = null;
+let photoData = "";
+
+document.getElementById("photo").addEventListener("change",function(){
+
+let file=this.files[0];
+
+if(!file) return;
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+photoData=e.target.result;
+
+let preview=document.getElementById("preview");
+
+preview.src=photoData;
+preview.classList.remove("hidden");
+
+};
+
+reader.readAsDataURL(file);
+
+});
 
 function showAdd(){
 
 document.getElementById("addSection").classList.remove("hidden");
 document.getElementById("viewSection").classList.add("hidden");
+
+clearForm();
 
 }
 
@@ -136,7 +177,7 @@ loadStudents();
 
 }
 
-function addStudent(){
+function saveStudent(){
 
 let name=document.getElementById("name").value;
 let roll=document.getElementById("roll").value;
@@ -147,25 +188,29 @@ let student={
 name:name,
 roll:roll,
 program:program,
-email:email
+email:email,
+photo:photoData
 };
+
+if(editIndex===null){
 
 students.push(student);
 
-localStorage.setItem("students",JSON.stringify(students));
+}else{
 
-alert("Student Added Successfully");
+students[editIndex]=student;
 
-clearForm();
+editIndex=null;
 
 }
 
-function clearForm(){
+localStorage.setItem("students",JSON.stringify(students));
 
-document.getElementById("name").value="";
-document.getElementById("roll").value="";
-document.getElementById("program").value="";
-document.getElementById("email").value="";
+alert("Student Saved");
+
+clearForm();
+
+loadStudents();
 
 }
 
@@ -198,10 +243,63 @@ let s=students[index];
 
 document.getElementById("studentDetails").innerHTML=
 
+'<img src="'+s.photo+'" class="student-photo">'+
 "<h3>"+s.name+"</h3>"+
 "<p><b>Roll:</b> "+s.roll+"</p>"+
 "<p><b>Program:</b> "+s.program+"</p>"+
-"<p><b>Email:</b> "+s.email+"</p>";
+"<p><b>Email:</b> "+s.email+"</p>"+
+'<button onclick="editStudent('+index+')">Edit</button>'+
+'<button onclick="deleteStudent('+index+')">Delete</button>';
+
+}
+
+function editStudent(index){
+
+let s=students[index];
+
+showAdd();
+
+document.getElementById("name").value=s.name;
+document.getElementById("roll").value=s.roll;
+document.getElementById("program").value=s.program;
+document.getElementById("email").value=s.email;
+
+photoData=s.photo;
+
+let preview=document.getElementById("preview");
+
+preview.src=s.photo;
+preview.classList.remove("hidden");
+
+editIndex=index;
+
+}
+
+function deleteStudent(index){
+
+if(!confirm("Delete this student?")) return;
+
+students.splice(index,1);
+
+localStorage.setItem("students",JSON.stringify(students));
+
+loadStudents();
+
+document.getElementById("studentDetails").innerHTML="Student deleted";
+
+}
+
+function clearForm(){
+
+document.getElementById("name").value="";
+document.getElementById("roll").value="";
+document.getElementById("program").value="";
+document.getElementById("email").value="";
+document.getElementById("photo").value="";
+
+photoData="";
+
+document.getElementById("preview").classList.add("hidden");
 
 }
 
