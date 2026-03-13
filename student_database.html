@@ -32,11 +32,13 @@ width:250px;
 
 button{
 padding:10px 20px;
+margin:10px;
 background:#2e7d32;
 color:white;
 border:none;
-border-radius:6px;
+border-radius:8px;
 cursor:pointer;
+font-size:15px;
 }
 
 button:hover{
@@ -51,25 +53,54 @@ border-radius:10px;
 box-shadow:0 5px 10px rgba(0,0,0,0.15);
 }
 
+.hidden{
+display:none;
+}
+
+.home-btn{
+position:absolute;
+top:20px;
+left:20px;
+background:#ffffffcc;
+color:#1b5e20;
+font-weight:bold;
+}
+
 </style>
 </head>
 
 <body>
 
+<a href="index.html">
+<button class="home-btn">⬅ Go Back Home</button>
+</a>
+
 <div class="container">
 
 <h1>Student Database</h1>
 
-<h3>Add Student</h3>
+<button onclick="showAdd()">➕ Add Student</button>
+<button onclick="showView()">📋 Show Student</button>
+
+<!-- ADD STUDENT FORM -->
+
+<div id="addSection" class="hidden">
+
+<h3>Add Student Details</h3>
 
 <input id="name" placeholder="Student Name"><br>
 <input id="roll" placeholder="Roll Number"><br>
 <input id="program" placeholder="Program"><br>
 <input id="email" placeholder="Email"><br>
 
-<button onclick="addStudent()">Add Student</button>
+<button onclick="addStudent()">Save Student</button>
 
-<hr>
+</div>
+
+
+<!-- VIEW STUDENT -->
+
+<div id="viewSection" class="hidden">
 
 <h3>Select Student</h3>
 
@@ -83,9 +114,27 @@ Student details will appear here
 
 </div>
 
+</div>
+
 <script>
 
 let students = JSON.parse(localStorage.getItem("students")) || [];
+
+function showAdd(){
+
+document.getElementById("addSection").classList.remove("hidden");
+document.getElementById("viewSection").classList.add("hidden");
+
+}
+
+function showView(){
+
+document.getElementById("viewSection").classList.remove("hidden");
+document.getElementById("addSection").classList.add("hidden");
+
+loadStudents();
+
+}
 
 function addStudent(){
 
@@ -105,9 +154,18 @@ students.push(student);
 
 localStorage.setItem("students",JSON.stringify(students));
 
-loadStudents();
+alert("Student Added Successfully");
 
-alert("Student Added");
+clearForm();
+
+}
+
+function clearForm(){
+
+document.getElementById("name").value="";
+document.getElementById("roll").value="";
+document.getElementById("program").value="";
+document.getElementById("email").value="";
 
 }
 
@@ -122,7 +180,7 @@ students.forEach((s,index)=>{
 let option=document.createElement("option");
 
 option.value=index;
-option.text=s.name;
+option.text=s.name+" ("+s.roll+")";
 
 list.appendChild(option);
 
@@ -146,8 +204,6 @@ document.getElementById("studentDetails").innerHTML=
 "<p><b>Email:</b> "+s.email+"</p>";
 
 }
-
-loadStudents();
 
 </script>
 
